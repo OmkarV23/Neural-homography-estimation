@@ -7,11 +7,11 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class Net(nn.Module):
     def __init__(self):
         super(Net,self).__init__()
-        self.conv_kernals = [6,64,64,64,64,128,128,128,128]
+        self.conv_kernals = [2,64,64,64,64,128,128,128,128]
 
     def block(self, in_channels, out_channels):
         itr_block = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, 3),
+            nn.Conv2d(in_channels, out_channels, 3, padding=1),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True))
         return itr_block
@@ -19,9 +19,9 @@ class Net(nn.Module):
     def fc(self):
         fc_block = nn.Sequential(
             nn.Flatten(),
-            nn.AdaptiveAvgPool1d(512),
+            # nn.AdaptiveAvgPool1d(512),
             nn.Dropout(0.5),
-            nn.Linear(512,1024),
+            nn.Linear(128*16*16,1024),
             nn.Linear(1024,8),
         )
         return fc_block
@@ -33,7 +33,7 @@ class Net(nn.Module):
             itr_block = self.block(self.conv_kernals[i],self.conv_kernals[i+1])
             lst.append(itr_block)
             counter+=1
-            if counter%2==0:
+            if counter%2==0 and counter!=8:
                 lst.append(nn.MaxPool2d(2,stride=2))
         conv_layers = nn.Sequential(*lst)
         return conv_layers

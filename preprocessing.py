@@ -23,11 +23,12 @@ def random_perturb(phi=[-30,30]):
         patch_warp = None
     else:
         patch_warp = (patch.reshape(1,8)+factors).reshape(4,2)
+
     return patch, patch_warp, factors.astype(np.float32)
 
 
 for file in glob.glob('/workspace/omkar_projects/WPI_CV/AutoPano/phase2/coco128/images/train2017/*.jpg'):
-    image = cv2.imread(file)
+    image = cv2.cvtColor(cv2.imread(file),cv2.COLOR_BGR2GRAY)
     for i in range(n_iter):
         patch, patch_warp, factors = random_perturb()
         if patch is None:
@@ -36,10 +37,9 @@ for file in glob.glob('/workspace/omkar_projects/WPI_CV/AutoPano/phase2/coco128/
             matrix = cv2.getPerspectiveTransform(patch.astype(np.float32), patch_warp.astype(np.float32))
             mat_inv = np.linalg.inv(matrix)
             result = cv2.warpPerspective(image, mat_inv, (image.shape[1], image.shape[0]))
-            img_crop = image[patch[0][1]:patch[2][1], patch[0][0]:patch[1][0]] / 255.0
-            img_crop_warp = result[patch[0][1]:patch[2][1], patch[0][0]:patch[1][0]] / 255.0
-
-            patch_add = np.resize(np.concatenate([img_crop, img_crop_warp], axis=2), (128,128,6))
+            img_crop = image[patch[0][1]:patch[2][1], patch[0][0]:patch[1][0]]
+            img_crop_warp = result[patch[0][1]:patch[2][1], patch[0][0]:patch[1][0]]
+            patch_add = np.resize(np.concatenate([img_crop[:,:,None], img_crop_warp[:,:,None]], axis=2), (128,128,2))
             if patch_add.shape[0]!=128 and patch_add.shape[1]!=128:
                 warnings.warn('Patch size other than 128x128x6')
                 pass

@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
 import tqdm
+import sys
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 writer = SummaryWriter('./Tensorboard_summary')
@@ -19,6 +20,9 @@ valid_dataloader = DataLoader(valid_data, batch_size=32, shuffle=False)
 
 model = Net()
 model = model.model().to(device)
+
+print(summary(model, (2,128,128)))
+sys.exit(0)
 
 # print(model(torch.rand(1,6,100,100).to(device)).shape)
 
