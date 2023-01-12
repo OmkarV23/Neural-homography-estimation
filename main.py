@@ -21,11 +21,6 @@ valid_dataloader = DataLoader(valid_data, batch_size=32, shuffle=False)
 model = Net()
 model = model.model().to(device)
 
-print(summary(model, (2,128,128)))
-sys.exit(0)
-
-# print(model(torch.rand(1,6,100,100).to(device)).shape)
-
 criterion = nn.MSELoss()
 optimizer = optim.SGD(model.parameters(), lr=0.005, momentum=0.9)
 scheduler = optim.lr_scheduler.StepLR(optimizer,step_size=20,gamma=0.1)
